@@ -310,9 +310,33 @@ function SubmenuButton({
   );
 }
 
+const DEFAULT_FALLBACK_VIDEOS = [
+  {
+    id: "demo-blacktree-1",
+    title: "BlackTree TV - Saturday Movies: The Player (1992)",
+    provider: "Cloudflare",
+    videoUrl: "https://customer-nlwo0ik8gfher2ji.cloudflarestream.com/d99e2141121daef03fc2d67de62d50f6/watch",
+    size: 7200,
+  },
+  {
+    id: "demo-blacktree-2",
+    title: "BlackTree TV - Alex Haley's Queen (1993)",
+    provider: "Cloudflare",
+    videoUrl: "https://customer-nlwo0ik8gfher2ji.cloudflarestream.com/911e61694b9f91db87777a3c26d67f61/watch",
+    size: 16171,
+  },
+  {
+    id: "demo-hls-stream",
+    title: "BlackTree Stream Live Broadcast Demo",
+    provider: "HLS",
+    videoUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    size: 600,
+  },
+];
+
 const getStreamUrl = (video: any) => {
   if (!video) return "";
-  const provider = video.provider?.toLowerCase();
+  const provider = (video.provider || video.platform || "")?.toLowerCase();
   const url = video.videoUrl || "";
 
   if (provider === "youtube") {
@@ -323,8 +347,8 @@ const getStreamUrl = (video: any) => {
     return url;
   }
 
-  if (provider === "cloudflare") {
-    if (url.includes("cloudflarestream.com") && url.endsWith("/watch")) {
+  if (provider === "cloudflare" || url.includes("cloudflarestream.com")) {
+    if (url.endsWith("/watch")) {
       return url.replace(/\/watch$/, "/manifest/video.m3u8");
     }
     return url;
@@ -335,7 +359,7 @@ const getStreamUrl = (video: any) => {
 
 const getPosterUrl = (video: any) => {
   if (!video) return undefined;
-  const provider = video.provider?.toLowerCase();
+  const provider = (video.provider || video.platform || "")?.toLowerCase();
   const url = video.videoUrl || "";
 
   if (provider === "youtube") {
@@ -348,6 +372,13 @@ const getPosterUrl = (video: any) => {
     }
     // hqdefault.jpg is guaranteed to exist for all YouTube videos, preventing 404 logs
     return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  }
+
+  if (provider === "cloudflare" || url.includes("cloudflarestream.com")) {
+    const match = url.match(/cloudflarestream\.com\/([a-zA-Z0-9]+)/);
+    if (match && match[1]) {
+      return `https://customer-nlwo0ik8gfher2ji.cloudflarestream.com/${match[1]}/thumbnails/thumbnail.jpg`;
+    }
   }
 
   return undefined;
@@ -408,7 +439,7 @@ const VidPlayer = () => {
     refetchOnWindowFocus: false, 
   });
 
-  const videos = data?.data || [];
+  const videos = (data?.data && data.data.length > 0) ? data.data : DEFAULT_FALLBACK_VIDEOS;
 
   useEffect(() => {
     if (data?.serverTime) {
