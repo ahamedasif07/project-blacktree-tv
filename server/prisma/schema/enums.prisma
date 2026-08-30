@@ -1,0 +1,101 @@
+enum AuthProvider {
+  credential
+  google
+  apple
+}
+
+enum UserRole {
+  ADMIN
+  MODERATOR
+  USER
+}
+
+enum SubscriptionType {
+  STANDARD
+  PREMIUM
+  ELITE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  STRIPE
+  SSLCOMMERZ
+  BKASH
+  NAGAD
+  ROCKET
+}
+
+enum ChatBanType {
+  TIMEOUT
+  TEMP_BAN
+  PERMANENT
+}
+
+enum ModerationAction {
+  USER_BANNED
+  USER_UNBANNED
+  CHAT_MESSAGE_DELETED
+  CHAT_USER_MUTED
+  SUBSCRIPTION_CANCELLED
+  MOVIE_CREATED
+  MOVIE_UPDATED
+  MOVIE_DELETED
+  USER_ROLE_UPDATED
+}
+
+enum SubscriberStatus {
+  ACTIVE
+  UNSUBSCRIBED
+  BOUNCED
+  PENDING
+}
+
+enum MediaAssetType {
+  THUMBNAIL
+  POSTER
+  BANNER
+  VIDEO
+  TRAILER
+  SUBTITLE
+}
+
+enum CastRoleType {
+  ACTOR
+  DIRECTOR
+  PRODUCER
+  WRITER
+}
+
+enum ContentStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+  UNLISTED
+}
+
+
+enum InterviewAssetType {
+  VIDEO
+  THUMBNAIL
+  SUBTITLE
+  AUDIO
+}

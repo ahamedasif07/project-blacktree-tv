@@ -1,0 +1,22 @@
+model ModerationLog {
+  id String @id @default(cuid())
+
+  moderatorId String
+  moderator   User   @relation("ModeratorLogs", fields: [moderatorId], references: [id])
+
+  targetUserId String?
+  targetUser   User?   @relation("TargetUserLogs", fields: [targetUserId], references: [id])
+
+  action ModerationAction
+
+  description String?
+
+  ipAddress String?
+
+  createdAt DateTime @default(now())
+
+  @@index([moderatorId])
+  @@index([targetUserId])
+  @@index([action])
+  @@index([createdAt])
+}

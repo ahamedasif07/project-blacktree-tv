@@ -1,0 +1,19 @@
+model Actor {
+  id String @id @default(cuid())
+
+  name String
+  slug String @unique
+
+  biography String? @db.Text
+
+  birthDate DateTime?
+
+  profileImage String?
+
+  createdAt DateTime @default(now())
+
+  castIn MovieCast[]
+  interviews ActorInterview[]
+
+  @@index([slug])
+}

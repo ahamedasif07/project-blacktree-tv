@@ -1,0 +1,99 @@
+model ActorInterview {
+  id              String      @id @default(cuid())
+
+  title           String
+  slug            String      @unique
+
+  description     String?     @db.Text
+
+  videoUrl        String
+
+  thumbnailUrl    String?
+
+  durationSeconds Int?
+
+  languageId      String?
+
+  publishedAt     DateTime?
+
+  viewsCount      BigInt      @default(0)
+
+  status          ContentStatus @default(DRAFT)
+
+  isFeatured      Boolean     @default(false)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  actorId         String
+
+  actor           Actor       @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  movieId         String?
+
+  movie           Movie?      @relation(fields: [movieId], references: [id], onDelete: SetNull)
+
+  seriesId        String?
+
+  series          InterviewSeries? @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+
+  tags            ActorInterviewTag[]
+  assets          InterviewAsset[]
+
+  @@index([actorId])
+  @@index([movieId])
+  @@index([seriesId])
+  @@index([status])
+}
+
+model InterviewTag {
+  id        String              @id @default(cuid())
+
+  name      String              @unique
+  slug      String              @unique
+
+  interviews ActorInterviewTag[]
+}
+
+model ActorInterviewTag {
+  interviewId String
+  tagId       String
+
+  interview   ActorInterview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  tag         InterviewTag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([interviewId, tagId])
+}
+
+
+model InterviewAsset {
+  id            String   @id @default(cuid())
+
+  interviewId   String
+
+  type          InterviewAssetType
+
+  storageKey    String
+
+  playbackUrl   String?
+
+  language      String?
+
+  createdAt     DateTime @default(now())
+
+  interview     ActorInterview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+}
+
+
+model InterviewSeries {
+  id          String  @id @default(cuid())
+
+  title       String
+  slug        String  @unique
+
+  description String?
+
+  interviews  ActorInterview[]
+
+  createdAt   DateTime @default(now())
+}

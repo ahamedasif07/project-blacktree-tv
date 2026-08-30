@@ -1,0 +1,24 @@
+model UserProfile {
+  id String @id @default(cuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  displayName String?
+
+  avatar String?
+  banner String?
+
+  bio String?
+
+  country  String?
+  language String?
+
+  // Social links
+  facebookUrl String?
+  youtubeUrl  String?
+  discordUrl  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

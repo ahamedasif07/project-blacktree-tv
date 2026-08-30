@@ -1,0 +1,58 @@
+model Subscription {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  plan   SubscriptionType
+  status SubscriptionStatus
+
+  price    Decimal @db.Decimal(10, 2)
+  currency String  @default("BDT")
+
+  startDate   DateTime
+  endDate     DateTime
+  cancelledAt DateTime?
+
+  payments PaymentHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([endDate])
+}
+
+model PaymentHistory {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+
+  provider PaymentProvider
+
+  transactionId String @unique
+
+  amount   Decimal @db.Decimal(10, 2)
+  currency String  @default("BDT")
+
+  status PaymentStatus
+
+  paymentMethod String?
+
+  paidAt        DateTime?
+  failureReason String?
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([subscriptionId])
+  @@index([transactionId])
+  @@index([status])
+}

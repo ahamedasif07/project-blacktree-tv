@@ -1,0 +1,47 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Next.js build outputs
+.next/
+out/
+build/
+dist/
+
+# IDE and Editor directories
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Version control
+.git/
+.gitignore
+.github/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun.lockb
+logs/
+*.log
+
+# Docker files (self)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# OS specific files
+Thumbs.db
+.DS_Store

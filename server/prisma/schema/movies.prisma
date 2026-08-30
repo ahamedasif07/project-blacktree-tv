@@ -1,0 +1,176 @@
+model Movie {
+  id String @id @default(cuid())
+
+  title String
+  slug  String @unique
+
+  shortDescription String? @db.VarChar(300)
+  description      String  @db.Text
+
+  releaseDate DateTime?
+
+  durationSeconds Int
+
+  maturityRatingId String
+  languageId       String
+
+  imdbRating      Float?
+  popularityScore Float? @default(0)
+
+  status ContentStatus @default(DRAFT)
+
+  visibility Visibility @default(PRIVATE)
+
+  featured Boolean @default(false)
+
+  viewsCount BigInt @default(0)
+
+  publishedAt DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  maturityRating MaturityRating @relation(fields: [maturityRatingId], references: [id])
+
+  language Language @relation(fields: [languageId], references: [id])
+
+  genres MovieGenre[]
+  cast   MovieCast[]
+
+  assets MediaAsset[]
+
+  trailers Trailer[]
+
+  keywords MovieKeyword[]
+
+  watchHistory WatchHistory[]
+  watchlist    Watchlist[]
+  interviews   ActorInterview[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([featured])
+  @@index([releaseDate])
+}
+
+model MediaAsset {
+  id String @id @default(cuid())
+
+  movieId String
+
+  type MediaAssetType
+
+  storageKey  String
+  playbackUrl String?
+
+  mimeType String?
+
+  width  Int?
+  height Int?
+
+  duration Int?
+
+  sizeInBytes BigInt?
+
+  isPrimary Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+  @@index([type])
+}
+
+model MovieCast {
+  movieId String
+  actorId String
+
+  characterName String?
+
+  roleType CastRoleType @default(ACTOR)
+
+  displayOrder Int?
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  actor Actor @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, actorId])
+  @@index([actorId])
+}
+
+model Genre {
+  id String @id @default(cuid())
+
+  name String
+  slug String @unique
+
+  movies MovieGenre[]
+}
+
+model MovieGenre {
+  movieId String
+  genreId String
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  genre Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, genreId])
+}
+
+model Language {
+  id String @id @default(cuid())
+
+  name String
+  code String @unique
+
+  movies Movie[]
+}
+
+model MaturityRating {
+  id String @id @default(cuid())
+
+  code String @unique
+
+  description String?
+
+  movies Movie[]
+}
+
+model Trailer {
+  id String @id @default(cuid())
+
+  movieId String
+
+  title String?
+
+  playbackUrl String
+
+  thumbnailUrl String?
+
+  createdAt DateTime @default(now())
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+}
+
+model Keyword {
+  id String @id @default(cuid())
+
+  name String @unique
+
+  movies MovieKeyword[]
+}
+
+model MovieKeyword {
+  movieId   String
+  keywordId String
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  keyword Keyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, keywordId])
+}
