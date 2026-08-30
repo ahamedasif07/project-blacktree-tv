@@ -63,7 +63,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { usePlayerStore } from "../store/player.store";
-import { FRONTEND_VIDEOS } from "../data/videos";
+import { FRONTEND_VIDEOS, VideoItem } from "../data/videos";
 
 interface CinematicControlsProps {
   title?: string;
@@ -436,8 +436,6 @@ function SubmenuButton({
     </Menu.Button>
   );
 }
-
-import { FRONTEND_VIDEOS, VideoItem } from "../data/videos";
 
 const getStreamUrl = (video: VideoItem | null) => {
   if (!video) return "";

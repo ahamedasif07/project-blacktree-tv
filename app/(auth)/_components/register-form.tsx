@@ -23,6 +23,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { ZCAuthRegister, ZTAuthRegister } from "@/types/zod/auth";
 
 export const RegisterForm = () => {
