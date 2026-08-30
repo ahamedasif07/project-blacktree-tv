@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from "zustand";
 import { PlayerState } from "../types/player.types";
+import { VideoItem } from "../data/videos";
 
 interface PlayerStore extends PlayerState {
-  activeVideo: any;
-  setActiveVideo: (video: any) => void;
+  activeVideo: VideoItem | null;
+  setActiveVideo: (video: VideoItem | null) => void;
   setPlaying: (isPlaying: boolean) => void;
   setCurrentTime: (time: number) => void;
   setDuration: (duration: number) => void;

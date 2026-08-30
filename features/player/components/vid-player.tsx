@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
@@ -438,9 +437,11 @@ function SubmenuButton({
   );
 }
 
-const getStreamUrl = (video: any) => {
+import { FRONTEND_VIDEOS, VideoItem } from "../data/videos";
+
+const getStreamUrl = (video: VideoItem | null) => {
   if (!video) return "";
-  const provider = (video.provider || video.platform || "")?.toLowerCase();
+  const provider = (video.provider || "").toLowerCase();
   const url = video.videoUrl || "";
 
   if (provider === "youtube" || url.includes("youtube.com") || url.includes("youtu.be")) {
@@ -464,9 +465,9 @@ const getStreamUrl = (video: any) => {
   return url;
 };
 
-const getPosterUrl = (video: any) => {
+const getPosterUrl = (video: VideoItem | null) => {
   if (!video) return undefined;
-  const provider = (video.provider || video.platform || "")?.toLowerCase();
+  const provider = (video.provider || "").toLowerCase();
   const url = video.videoUrl || "";
 
   if (provider === "youtube" || url.includes("youtube.com") || url.includes("youtu.be")) {
@@ -562,7 +563,7 @@ const VidPlayer = () => {
   const handleEnded = () => {
     if (videos.length > 0 && activeVideo) {
       const currentIndex = videos.findIndex(
-        (v: any) => v.id === activeVideo.id,
+        (v: VideoItem) => v.id === activeVideo.id,
       );
       const nextIndex = (currentIndex + 1) % videos.length; // Advance to next video (or loop back to first)
       const nextVideo = videos[nextIndex];
@@ -596,7 +597,7 @@ const VidPlayer = () => {
   const handleNext = () => {
     if (videos.length > 0 && activeVideo) {
       const currentIndex = videos.findIndex(
-        (v: any) => v.id === activeVideo.id,
+        (v: VideoItem) => v.id === activeVideo.id,
       );
       const nextIndex = (currentIndex + 1) % videos.length;
       const nextVideo = videos[nextIndex];
@@ -616,7 +617,7 @@ const VidPlayer = () => {
   const handlePrev = () => {
     if (videos.length > 0 && activeVideo) {
       const currentIndex = videos.findIndex(
-        (v: any) => v.id === activeVideo.id,
+        (v: VideoItem) => v.id === activeVideo.id,
       );
       const prevIndex = (currentIndex - 1 + videos.length) % videos.length;
       const prevVideo = videos[prevIndex];

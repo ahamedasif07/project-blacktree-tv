@@ -1,21 +1,23 @@
 import { create } from "zustand";
 
-interface User {
+export interface AuthUser {
   id: string;
-  name?: string;
+  name: string;
   email: string;
+  avatar?: string;
   image?: string;
   role: string;
+  status?: string;
   subscription?: {
     type: string;
   } | null;
 }
 
 interface AuthState {
-  user: User | null;
+  user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  setUser: (user: User | null) => void;
+  setUser: (user: AuthUser | null) => void;
   setLoading: (isLoading: boolean) => void;
   logout: () => void;
 }

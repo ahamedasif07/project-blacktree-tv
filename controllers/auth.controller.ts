@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthService } from "@/services/auth.service";
 import { getTokenFromRequest, verifyToken } from "@/lib/jwt";
 
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return fallback;
+}
+
 export class AuthController {
   /**
    * Handle Login Request
@@ -37,10 +44,11 @@ export class AuthController {
       });
 
       return response;
-    } catch (error: any) {
-      console.error("Login Controller Error:", error.message);
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, "Failed to sign in");
+      console.error("Login Controller Error:", message);
       return NextResponse.json(
-        { success: false, message: error.message || "Failed to sign in" },
+        { success: false, message },
         { status: 401 }
       );
     }
@@ -83,10 +91,11 @@ export class AuthController {
       });
 
       return response;
-    } catch (error: any) {
-      console.error("Register Controller Error:", error.message);
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, "Registration failed");
+      console.error("Register Controller Error:", message);
       return NextResponse.json(
-        { success: false, message: error.message || "Registration failed" },
+        { success: false, message },
         { status: 400 }
       );
     }
@@ -134,10 +143,11 @@ export class AuthController {
           createdAt: user.createdAt,
         },
       });
-    } catch (error: any) {
-      console.error("GetMe Controller Error:", error.message);
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, "Failed to authenticate session");
+      console.error("GetMe Controller Error:", message);
       return NextResponse.json(
-        { success: false, message: "Failed to authenticate session", user: null },
+        { success: false, message, user: null },
         { status: 401 }
       );
     }

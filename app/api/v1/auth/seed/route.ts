@@ -8,9 +8,10 @@ export async function GET() {
       success: true,
       message: "Super Admin initialized: rxasif31@gmail.com (Name: RX asif 100, Role: SUPER_ADMIN)",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to seed super admin";
     return NextResponse.json(
-      { success: false, message: error.message || "Failed to seed super admin" },
+      { success: false, message },
       { status: 500 }
     );
   }

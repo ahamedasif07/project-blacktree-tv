@@ -1,9 +1,24 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import parsedVideos from "@/data/parsed/video.json";
 
+export interface ParsedVideo {
+  platform?: string;
+  title?: string;
+  runtimeSeconds?: number;
+  videoUrl?: string;
+}
+
+export interface VideoResponseItem {
+  id: string;
+  title: string;
+  provider: string;
+  videoUrl: string;
+  size: number;
+  createdAt: string;
+}
+
 // High-quality Marvel Studios Avengers video clips & trailers fallback
-const DEMO_FALLBACK_VIDEOS = [
+const DEMO_FALLBACK_VIDEOS: VideoResponseItem[] = [
   {
     id: "marvel-avengers-endgame",
     title: "Marvel Studios' Avengers: Endgame - Official Trailer",
@@ -38,10 +53,12 @@ const DEMO_FALLBACK_VIDEOS = [
   },
 ];
 
+const typedParsedVideos: ParsedVideo[] = parsedVideos as ParsedVideo[];
+
 // Map all parsed videos from video.json
-const ALL_FALLBACK_VIDEOS = [
+const ALL_FALLBACK_VIDEOS: VideoResponseItem[] = [
   ...DEMO_FALLBACK_VIDEOS,
-  ...((parsedVideos as any[]) || []).map((item, index) => ({
+  ...typedParsedVideos.map((item, index) => ({
     id: `fallback-${index + 1}`,
     title: item.title || `Video ${index + 1}`,
     provider: item.platform || "Cloudflare",
@@ -112,8 +129,9 @@ export async function GET(request: NextRequest) {
         hasPrevPage: currentPage > 1,
       },
     });
-  } catch (error: any) {
-    console.error("Error in GET /api/video:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Internal server error";
+    console.error("Error in GET /api/video:", errorMessage);
     return NextResponse.json({
       success: true,
       data: DEMO_FALLBACK_VIDEOS,
