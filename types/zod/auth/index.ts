@@ -1,5 +1,0 @@
-export * from "./auth.login"
-export * from "./auth.register"
-export * from "./auth.forgot-password"
-export * from "./auth.verify-otp"
-export * from "./auth.reset-password"

@@ -8,72 +8,142 @@ import {
   Zap,
   PlayCircle,
   ShieldCheck,
+  Sparkles,
+  Award,
+  Flame,
+  Radio,
+  Sliders,
+  Layers,
 } from "lucide-react";
+
+export const aboutStats = [
+  {
+    value: "15M+",
+    label: "Monthly Active Viewers",
+    subtext: "Across 190+ countries",
+  },
+  {
+    value: "2,500+",
+    label: "Curated Features & Docs",
+    subtext: "4K UHD Master Quality",
+  },
+  {
+    value: "24/7",
+    label: "Live Cinema Broadcast",
+    subtext: "Continuous curated stream",
+  },
+  {
+    value: "99.9%",
+    label: "Stream Uptime SLA",
+    subtext: "Ultra-low latency HLS",
+  },
+];
+
 export const coreFeatures = [
   {
-    icon: Tv,
-    title: "24/7 Live",
-    desc: "Uninterrupted curated cinematic feeds.",
+    icon: Radio,
+    title: "24/7 Live Broadcast",
+    desc: "Uninterrupted, professionally curated cinematic channels streaming around the clock.",
+    tag: "Non-Stop",
   },
   {
     icon: Users,
     title: "Watch Together",
-    desc: "Sync play with friends globally.",
+    desc: "Synchronized group viewing rooms with ultra-fast real-time audio and text chat.",
+    tag: "Social",
   },
   {
     icon: UserCheck,
-    title: "Actor Focused",
-    desc: "Deep dives into star filmographies.",
+    title: "Spotlight On Talent",
+    desc: "Deep-dive career retrospectives, exclusive director cuts, and raw backstage interviews.",
+    tag: "Exclusive",
   },
   {
     icon: Globe,
-    title: "Accessibility",
-    desc: "Content available across 190+ countries.",
+    title: "Global Reach",
+    desc: "Worldwide delivery pipeline optimized across 190+ countries with multi-language captions.",
+    tag: "Worldwide",
   },
   {
     icon: MessageSquare,
-    title: "Live Chat",
-    desc: "Real-time discussion with movie buffs.",
+    title: "Interactive Live Chat",
+    desc: "Connect in real-time with passionate film enthusiasts, critics, and guest filmmakers.",
+    tag: "Community",
   },
   {
     icon: Tv2,
-    title: "Cast & Enjoy",
-    desc: "Seamless streaming to any screen.",
+    title: "Universal Casting",
+    desc: "One-touch AirPlay, Google Cast, and native TV app sync for the authentic big-screen feel.",
+    tag: "Multi-Device",
   },
 ];
 
 export const stars = [
   {
-    name: "Alex Rivera",
-    role: "Director / Creator",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=600&h=800",
-  },
-  {
     name: "Marcus Vance",
-    role: "Lead Actor",
-    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600&h=800",
+    role: "Lead Actor & Director",
+    tagline: "Breaking barriers in independent narrative cinema",
+    awards: "Best Actor - Sundance 2024",
+    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=800",
   },
   {
     name: "Sarah Jenkins",
-    role: "Cinematographer",
-    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=600&h=800",
+    role: "Master Cinematographer",
+    tagline: "Crafting atmospheric visual poetry for 35mm & IMAX",
+    awards: "Excellence in Cinematography",
+    img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800",
+  },
+  {
+    name: "Alex Rivera",
+    role: "Executive Producer",
+    tagline: "Championing diverse global voices and unfiltered narratives",
+    awards: "Film Independent Spirit Award",
+    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800",
   },
 ];
 
 export const technicalFeatures = [
   {
     icon: Zap,
-    title: "Powerful Streaming",
-    desc: "Ultra-low latency delivery optimized for 4K and 8K resolution.",
+    title: "Ultra-Fast Edge Streaming",
+    desc: "Adaptive bitrate engine delivering buttery smooth 4K HDR playback even on low bandwidth connections.",
   },
   {
-    icon: PlayCircle,
-    title: "Smart Playlist System",
-    desc: "AI-driven curation that understands your cinematic taste.",
+    icon: Sliders,
+    title: "AI-Powered Curation",
+    desc: "Context-aware machine learning that recommends cinematic masterworks aligned with your precise taste.",
   },
   {
     icon: ShieldCheck,
-    title: "Secure & Legal",
-    desc: "Full copyright protection and encrypted streaming sessions.",
+    title: "Studio-Grade Security",
+    desc: "Encrypted DRM pipelines ensuring maximum creator royalty protection and authentic licensed content.",
+  },
+  {
+    icon: Layers,
+    title: "Dolby Atmos & Spatial Audio",
+    desc: "Immersive multi-channel acoustics that place you directly in the center of every scene.",
+  },
+];
+
+export const timelineMilestones = [
+  {
+    year: "2010",
+    title: "The Genesis",
+    description: "Started as an independent underground film festival showcasing untold stories.",
+  },
+  {
+    year: "2016",
+    title: "Live Streaming Launch",
+    description: "Pioneered 24/7 curated black cinema webcasts for global viewers.",
+  },
+  {
+    year: "2021",
+    title: "Originals & 4K UHD",
+    description: "Invested in exclusive productions, creator grants, and high-fidelity streaming.",
+  },
+  {
+    year: "2026",
+    title: "Next-Gen BlackTree TV",
+    description: "Interactive real-time community, universal multi-device sync, and global scale.",
   },
 ];

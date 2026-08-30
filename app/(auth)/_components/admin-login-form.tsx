@@ -74,7 +74,7 @@ export const AdminLoginForm = () => {
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center justify-between">
                 <span>Username or Email</span>
-                <span className="text-[10px] text-zinc-500 lowercase font-normal">e.g. admin or rxasif31@gmail.com</span>
+                
               </label>
               <div className="relative">
                 <UserCheck className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
@@ -82,7 +82,7 @@ export const AdminLoginForm = () => {
                   type="text"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="admin or rxasif31@gmail.com"
+                  placeholder="Enter admin username or email"
                   required
                   autoComplete="username"
                   className="h-12 pl-10 pr-4 rounded-xl border-white/10 bg-zinc-900/70 text-sm text-white placeholder:text-zinc-600 focus-visible:border-red-500 focus-visible:ring-2 focus-visible:ring-red-500/20 transition-all"
@@ -103,7 +103,7 @@ export const AdminLoginForm = () => {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Enter admin password"
                   required
                   autoComplete="current-password"
                   className="h-12 pl-10 pr-11 rounded-xl border-white/10 bg-zinc-900/70 text-sm text-white placeholder:text-zinc-600 focus-visible:border-red-500 focus-visible:ring-2 focus-visible:ring-red-500/20 transition-all"
