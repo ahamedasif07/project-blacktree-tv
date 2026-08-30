@@ -23,26 +23,48 @@ export class AuthService {
     try {
       await connectDB();
       const superAdminEmail = "rxasif31@gmail.com";
+      const superAdminName = "admin";
+      const defaultPassword = process.env.SUPER_ADMIN_PASSWORD || "RX asif 100";
+
       const existingSuperAdmin = await User.findOne({ email: superAdminEmail });
 
       if (!existingSuperAdmin) {
-        const defaultPassword = process.env.SUPER_ADMIN_PASSWORD || "RXasif@100";
         const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
         await User.create({
-          name: "RX asif 100",
+          name: superAdminName,
           email: superAdminEmail,
           password: hashedPassword,
           role: "SUPER_ADMIN",
           status: "ACTIVE",
-          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=RXasif100",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=admin",
         });
 
-        console.log("👑 Super Admin seeded successfully: rxasif31@gmail.com");
+        console.log("👑 Super Admin seeded successfully: rxasif31@gmail.com (Username: admin)");
       } else {
-        // Ensure super admin role
+        let isModified = false;
+        if (existingSuperAdmin.name !== superAdminName) {
+          existingSuperAdmin.name = superAdminName;
+          isModified = true;
+        }
         if (existingSuperAdmin.role !== "SUPER_ADMIN") {
           existingSuperAdmin.role = "SUPER_ADMIN";
+          isModified = true;
+        }
+        if (existingSuperAdmin.status !== "ACTIVE") {
+          existingSuperAdmin.status = "ACTIVE";
+          isModified = true;
+        }
+
+        // Ensure password matches RX asif 100 or RXasif@100
+        const isPassValid1 = await bcrypt.compare("RX asif 100", existingSuperAdmin.password);
+        const isPassValid2 = await bcrypt.compare("RXasif@100", existingSuperAdmin.password);
+        if (!isPassValid1 && !isPassValid2) {
+          existingSuperAdmin.password = await bcrypt.hash(defaultPassword, 10);
+          isModified = true;
+        }
+
+        if (isModified) {
           await existingSuperAdmin.save();
         }
       }
@@ -52,22 +74,43 @@ export class AuthService {
   }
 
   /**
-   * Authenticate user with Email & Password
+   * Authenticate user with Email/Username & Password
    */
-  static async login(email: string, password: string): Promise<AuthResponse> {
+  static async login(identifier: string, password: string): Promise<AuthResponse> {
     await connectDB();
     await this.seedSuperAdmin();
 
-    const normalizedEmail = email.toLowerCase().trim();
-    const user = await User.findOne({ email: normalizedEmail });
-
-    if (!user || !user.password) {
-      throw new Error("Invalid email or password");
+    const normalizedIdentifier = identifier.trim();
+    if (!normalizedIdentifier) {
+      throw new Error("Please enter your username or email");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Look up by Email OR Name/Username (case-insensitive)
+    const escapedIdentifier = normalizedIdentifier.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const user = await User.findOne({
+      $or: [
+        { email: normalizedIdentifier.toLowerCase() },
+        { name: { $regex: new RegExp(`^${escapedIdentifier}$`, "i") } },
+      ],
+    });
+
+    if (!user || !user.password) {
+      throw new Error("Invalid username/email or password");
+    }
+
+    let isPasswordValid = await bcrypt.compare(password, user.password);
+
+    // Fallback support for Super Admin credentials variants
+    if (!isPasswordValid && user.email === "rxasif31@gmail.com") {
+      if (password === "RX asif 100" || password === "RXasif@100") {
+        isPasswordValid = true;
+        // Update to new hash
+        user.password = await bcrypt.hash(password, 10);
+      }
+    }
+
     if (!isPasswordValid) {
-      throw new Error("Invalid email or password");
+      throw new Error("Invalid username/email or password");
     }
 
     // Update last login

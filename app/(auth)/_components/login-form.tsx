@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2, Lock, Mail, ShieldCheck, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, Mail, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { useRouter } from "next/navigation";
@@ -28,18 +28,17 @@ export const LoginForm = () => {
     try {
       const success = await signIn({ email, password });
       if (success) {
-        router.push("/");
+        // If user is admin/superadmin, redirect to admin dashboard, else home
+        const currentUser = useAuthStore.getState().user;
+        if (currentUser?.role === "SUPER_ADMIN" || currentUser?.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/");
+        }
       }
     } catch {
       // Error handled in store toast
     }
-  };
-
-  // Quick 1-click fill Super Admin demo credentials
-  const handleQuickFillAdmin = () => {
-    setEmail("rxasif31@gmail.com");
-    setPassword("RXasif@100");
-    toast.info("Super Admin credentials filled!");
   };
 
   return (
@@ -58,16 +57,6 @@ export const LoginForm = () => {
               Sign in to stream premium movies and shows.
             </CardDescription>
           </div>
-
-          {/* Quick Demo Super Admin Badge */}
-          <button
-            type="button"
-            onClick={handleQuickFillAdmin}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer mx-auto"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-red-400 animate-pulse" />
-            <span>Super Admin: <b>rxasif31@gmail.com</b></span>
-          </button>
         </CardHeader>
 
         <CardContent className="space-y-6">
@@ -83,7 +72,7 @@ export const LoginForm = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="rxasif31@gmail.com"
+                  placeholder="you@example.com"
                   required
                   className="h-12 pl-10 pr-4 rounded-xl border-white/10 bg-zinc-900/60 text-sm text-white placeholder:text-zinc-600 focus-visible:border-red-500 focus-visible:ring-2 focus-visible:ring-red-500/20 transition-all"
                 />
@@ -96,6 +85,12 @@ export const LoginForm = () => {
                 <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
                   Password
                 </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-zinc-400 hover:text-red-400 transition-colors"
+                >
+                  Forgot password?
+                </Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
@@ -135,15 +130,26 @@ export const LoginForm = () => {
           </form>
 
           {/* Footer Navigation */}
-          <p className="text-center text-xs text-zinc-400 pt-2">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/register"
-              className="font-semibold text-red-500 hover:text-red-400 hover:underline transition-colors"
-            >
-              Create an account
-            </Link>
-          </p>
+          <div className="space-y-3 pt-2 text-center text-xs text-zinc-400">
+            <p>
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/register"
+                className="font-semibold text-red-500 hover:text-red-400 hover:underline transition-colors"
+              >
+                Create an account
+              </Link>
+            </p>
+
+            <div className="pt-2 border-t border-white/5">
+              <Link
+                href="/admin-login"
+                className="text-[11px] text-zinc-500 hover:text-zinc-300 transition-colors inline-flex items-center gap-1"
+              >
+                <span>Admin Portal</span> &rarr;
+              </Link>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

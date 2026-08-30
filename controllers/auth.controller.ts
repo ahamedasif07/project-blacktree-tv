@@ -16,16 +16,17 @@ export class AuthController {
   static async login(request: NextRequest): Promise<NextResponse> {
     try {
       const body = await request.json();
-      const { email, password } = body;
+      const identifier = body.identifier || body.email || body.username;
+      const { password } = body;
 
-      if (!email || !password) {
+      if (!identifier || !password) {
         return NextResponse.json(
-          { success: false, message: "Email and password are required" },
+          { success: false, message: "Username/Email and password are required" },
           { status: 400 }
         );
       }
 
-      const { user, token } = await AuthService.login(email, password);
+      const { user, token } = await AuthService.login(identifier, password);
 
       const response = NextResponse.json({
         success: true,
