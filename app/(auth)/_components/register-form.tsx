@@ -23,9 +23,8 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth/auth-client";
 import { ZCAuthRegister, ZTAuthRegister } from "@/types/zod/auth";
+
 export const RegisterForm = () => {
   const [showPassword, setShowPassword] = React.useState(false);
 
@@ -44,18 +43,8 @@ export const RegisterForm = () => {
     signUp(data);
   };
 
-  const handleSocialLogin = async (provider: "google" | "facebook") => {
-    try {
-      await authClient.signIn.social({
-        provider: provider,
-        callbackURL: "http://localhost:3000",
-      });
-    } catch (error) {
-      toast("Registration Failed", {
-        position: "bottom-right",
-      });
-      console.log(error);
-    }
+  const handleSocialLogin = (provider: "google" | "facebook") => {
+    toast.info(`${provider.charAt(0).toUpperCase() + provider.slice(1)} registration will be available soon`);
   };
 
   return (
