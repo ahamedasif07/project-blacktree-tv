@@ -3,38 +3,38 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import parsedVideos from "@/data/parsed/video.json";
 
-// Standard demo videos as initial high-availability fallback
+// High-quality Marvel Studios Avengers video clips & trailers fallback
 const DEMO_FALLBACK_VIDEOS = [
   {
-    id: "demo-blacktree-1",
-    title: "BlackTree TV - Saturday Movies: The Player (1992)",
-    provider: "Cloudflare",
-    videoUrl: "https://customer-nlwo0ik8gfher2ji.cloudflarestream.com/d99e2141121daef03fc2d67de62d50f6/watch",
-    size: 7200,
+    id: "marvel-avengers-endgame",
+    title: "Marvel Studios' Avengers: Endgame - Official Trailer",
+    provider: "YouTube",
+    videoUrl: "https://www.youtube.com/watch?v=TcMBFSGVi1c",
+    size: 146,
     createdAt: new Date().toISOString(),
   },
   {
-    id: "demo-blacktree-2",
-    title: "BlackTree TV - Alex Haley's Queen (1993)",
-    provider: "Cloudflare",
-    videoUrl: "https://customer-nlwo0ik8gfher2ji.cloudflarestream.com/911e61694b9f91db87777a3c26d67f61/watch",
-    size: 16171,
+    id: "marvel-avengers-infinity-war",
+    title: "Marvel Studios' Avengers: Infinity War - Official Trailer",
+    provider: "YouTube",
+    videoUrl: "https://www.youtube.com/watch?v=6ZfuNTqbHE8",
+    size: 144,
     createdAt: new Date().toISOString(),
   },
   {
-    id: "demo-blacktree-3",
-    title: "BlackTree TV - Malcolm X (1992)",
-    provider: "Cloudflare",
-    videoUrl: "https://customer-nlwo0ik8gfher2ji.cloudflarestream.com/d2426a889feeddc1c68e4327a044d8e9/watch",
-    size: 12072,
+    id: "marvel-the-avengers",
+    title: "Marvel Studios' The Avengers - Official Trailer",
+    provider: "YouTube",
+    videoUrl: "https://www.youtube.com/watch?v=eOrNdBpGMv8",
+    size: 135,
     createdAt: new Date().toISOString(),
   },
   {
-    id: "demo-hls-stream",
-    title: "BlackTree Stream Live Broadcast Demo",
-    provider: "HLS",
-    videoUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    size: 600,
+    id: "marvel-avengers-to-the-end",
+    title: "Marvel Studios' Avengers: Endgame - 'To the End'",
+    provider: "YouTube",
+    videoUrl: "https://www.youtube.com/watch?v=0jNvJU52LvU",
+    size: 150,
     createdAt: new Date().toISOString(),
   },
 ];

@@ -5,8 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   AirPlayButton,
   CaptionButton,
-  useActiveTextCues,
-  useActiveTextTrack,
   Controls,
   FullscreenButton,
   GoogleCastButton,
@@ -15,9 +13,16 @@ import {
   MediaProvider,
   Menu,
   MuteButton,
+  PIPButton,
+  PlayButton,
   Poster,
+  SeekButton,
   Spinner,
+  Time,
+  TimeSlider,
   VolumeSlider,
+  useActiveTextCues,
+  useActiveTextTrack,
   useCaptionOptions,
   useMediaState,
   usePlaybackRateOptions,
@@ -44,8 +49,14 @@ import {
   MessageSquare,
   MessageSquareOff,
   Minimize,
+  Pause,
   PictureInPicture,
+  Play,
+  RotateCcw,
+  RotateCw,
   Settings,
+  SkipBack,
+  SkipForward,
   Volume1,
   Volume2,
   VolumeOff,
@@ -53,109 +64,226 @@ import {
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { usePlayerStore } from "../store/player.store";
+import { FRONTEND_VIDEOS } from "../data/videos";
 
-const CinematicControls = ({ title }: { title?: string }) => {
+interface CinematicControlsProps {
+  title?: string;
+  onNext?: () => void;
+  onPrev?: () => void;
+}
+
+const CinematicControls = ({ title, onNext, onPrev }: CinematicControlsProps) => {
   const { isChatOpen, toggleChat } = usePlayerStore();
 
   return (
     <Controls.Root
-      className={`absolute inset-0 z-50 flex flex-col justify-end gap-2 md:gap-4 transition-opacity duration-300 opacity-0 data-visible:opacity-100 ${
-        isChatOpen ? "px-6  py-4" : "px-6 py-4 md:py-8 lg:py-12"
+      className={`absolute inset-0 z-50 flex flex-col justify-end gap-2 md:gap-3 transition-opacity duration-300 opacity-0 data-visible:opacity-100 bg-gradient-to-t from-black/90 via-black/40 to-transparent ${
+        isChatOpen ? "px-4 py-3 md:px-6 md:py-4" : "px-4 py-3 md:px-6 md:py-6"
       }`}
     >
       {/* Middle Section: Typography */}
-      <div className="flex flex-col gap-1 md:gap-2 items-start max-w-2xl pointer-events-none select-none">
-        <h1 className="text-white text-lg md:text-2xl font-medium tracking-tighter uppercase leading-none">
-          {title || "BEYOND THE STORY"}
+      <div className="flex flex-col gap-1 items-start max-w-2xl pointer-events-none select-none px-1">
+        <h1 className="text-white text-base md:text-xl font-semibold tracking-tight uppercase leading-tight line-clamp-1 drop-shadow-md">
+          {title || "MARVEL CINEMATIC FEATURE"}
         </h1>
       </div>
+
+      {/* Progress / Time Seek Bar */}
+      <div className="w-full pointer-events-auto px-1">
+        <TimeSlider.Root className="time-slider group relative inline-flex h-6 w-full cursor-pointer touch-none select-none items-center outline-none">
+          <TimeSlider.Track className="relative ring-sky-400 z-0 h-1 md:h-1.5 w-full rounded-sm bg-white/30 group-data-focus:ring-[3px] group-hover:h-2 transition-all">
+            <TimeSlider.TrackFill className="bg-primary absolute h-full w-(--slider-fill) rounded-sm will-change-[width]" />
+            <TimeSlider.Progress className="bg-white/40 absolute h-full w-(--slider-progress) rounded-sm will-change-[width]" />
+          </TimeSlider.Track>
+
+          <TimeSlider.Thumb className="absolute left-(--slider-fill) top-1/2 z-20 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white bg-primary opacity-0 ring-white/40 transition-opacity group-data-active:opacity-100 group-hover:opacity-100 will-change-[left]" />
+
+          <TimeSlider.Preview className="flex flex-col items-center opacity-0 transition-opacity duration-200 data-visible:opacity-100 pointer-events-none">
+            <TimeSlider.Value className="rounded-sm bg-black/95 border border-white/10 px-2 py-0.5 text-xs font-mono text-white shadow-lg" />
+          </TimeSlider.Preview>
+        </TimeSlider.Root>
+      </div>
+
       {/* Bottom Section: Controls */}
-      <div className="flex justify-between items-end w-full pointer-events-auto">
-        {/* Sound Control Group */}
-        <div className="flex items-center gap-2 md:gap-4 group/volume">
-          <MuteButton className="group ring-sky-400 relative inline-flex px-2 h-8 w-8 md:h-10 md:w-10 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-indigo-400">
-            <VolumeOff className="w-4 h-4 md:w-5 md:h-5 hidden group-data-[state='muted']:block" />
-            <Volume1 className="w-4 h-4 md:w-5 md:h-5 hidden group-data-[state='low']:block" />
-            <Volume2 className="w-4 h-4 md:w-5 md:h-5 hidden group-data-[state='high']:block" />
-          </MuteButton>
+      <div className="flex justify-between items-center w-full pointer-events-auto px-1">
+        {/* Left Control Group (Playback & Audio) */}
+        <div className="flex items-center gap-1.5 md:gap-3 text-white">
+          {/* Play / Pause Button */}
+          <PlayButton
+            className="group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+            aria-label="Play / Pause"
+          >
+            <Play className="w-4 h-4 md:w-5 md:h-5 fill-current hidden group-data-[paused]:block" />
+            <Pause className="w-4 h-4 md:w-5 md:h-5 fill-current block group-data-[paused]:hidden" />
+          </PlayButton>
 
-          <VolumeSlider.Root className="group relative mx-[7.5px] hidden md:inline-flex h-10 w-full min-w-20 cursor-pointer touch-none select-none items-center outline-none aria-hidden:hidden">
-            <VolumeSlider.Track className="relative ring-sky-400 z-0 h-1.25 w-full rounded-sm bg-white/30 group-data-focus:ring-[3px]">
-              <VolumeSlider.TrackFill className="bg-indigo-400 absolute h-full w-(--slider-fill) rounded-sm will-change-[width]" />
-            </VolumeSlider.Track>
-
-            <VolumeSlider.Preview
-              className="flex flex-col items-center opacity-0 transition-opacity duration-200 data-visible:opacity-100 pointer-events-none"
-              noClamp
+          {/* Previous Video Button */}
+          {onPrev && (
+            <button
+              onClick={onPrev}
+              className="group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+              aria-label="Previous Video"
+              title="Previous Video"
             >
-              <VolumeSlider.Value className="rounded-sm bg-black px-2 py-px text-[13px] font-medium text-white" />
-            </VolumeSlider.Preview>
+              <SkipBack className="w-4 h-4 md:w-5 md:h-5 fill-current" />
+            </button>
+          )}
 
-            <VolumeSlider.Thumb className="absolute left-(--slider-fill) top-1/2 z-20 h-3.75 w-3.75 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#cacaca] bg-white opacity-0 ring-white/40 transition-opacity group-data-active:opacity-100 group-data-dragging:ring-4 will-change-[left]" />
-          </VolumeSlider.Root>
+          {/* 10s Rewind Button */}
+          <SeekButton
+            seconds={-10}
+            className="group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+            aria-label="Rewind 10 seconds"
+            title="Rewind 10s"
+          >
+            <RotateCcw className="w-4 h-4 md:w-4.5 md:h-4.5" />
+          </SeekButton>
+
+          {/* 10s Fast Forward Button */}
+          <SeekButton
+            seconds={10}
+            className="group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+            aria-label="Forward 10 seconds"
+            title="Forward 10s"
+          >
+            <RotateCw className="w-4 h-4 md:w-4.5 md:h-4.5" />
+          </SeekButton>
+
+          {/* Next Video Button */}
+          {onNext && (
+            <button
+              onClick={onNext}
+              className="group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+              aria-label="Next Video"
+              title="Next Video"
+            >
+              <SkipForward className="w-4 h-4 md:w-5 md:h-5 fill-current" />
+            </button>
+          )}
+
+          {/* Sound Control Group */}
+          <div className="flex items-center gap-1 md:gap-2 group/volume ml-1">
+            <MuteButton className="group ring-sky-400 relative inline-flex px-1.5 h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors">
+              <VolumeOff className="w-4 h-4 md:w-5 md:h-5 hidden group-data-[state='muted']:block text-red-400" />
+              <Volume1 className="w-4 h-4 md:w-5 md:h-5 hidden group-data-[state='low']:block" />
+              <Volume2 className="w-4 h-4 md:w-5 md:h-5 hidden group-data-[state='high']:block" />
+            </MuteButton>
+
+            <VolumeSlider.Root className="group relative mx-1 hidden sm:inline-flex h-8 w-16 md:w-20 cursor-pointer touch-none select-none items-center outline-none aria-hidden:hidden">
+              <VolumeSlider.Track className="relative ring-sky-400 z-0 h-1 md:h-1.25 w-full rounded-sm bg-white/30 group-data-focus:ring-[3px]">
+                <VolumeSlider.TrackFill className="bg-primary absolute h-full w-(--slider-fill) rounded-sm will-change-[width]" />
+              </VolumeSlider.Track>
+
+              <VolumeSlider.Preview
+                className="flex flex-col items-center opacity-0 transition-opacity duration-200 data-visible:opacity-100 pointer-events-none"
+                noClamp
+              >
+                <VolumeSlider.Value className="rounded-sm bg-black px-2 py-px text-[11px] font-medium text-white" />
+              </VolumeSlider.Preview>
+
+              <VolumeSlider.Thumb className="absolute left-(--slider-fill) top-1/2 z-20 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white bg-primary opacity-0 ring-white/40 transition-opacity group-data-active:opacity-100 group-data-dragging:ring-4 will-change-[left]" />
+            </VolumeSlider.Root>
+          </div>
+
+          {/* Time Elapsed / Duration Display */}
+          <div className="flex items-center gap-1 text-[11px] md:text-xs font-mono text-white/80 select-none ml-1">
+            <Time className="time font-medium" type="current" />
+            <span className="text-white/40">/</span>
+            <Time className="time font-medium text-white/60" type="duration" />
+          </div>
         </div>
 
         {/* Right Action Group */}
-        <div className="flex items-center gap-2 md:gap-6">
-          <div className="flex items-center gap-1.5 md:gap-4 text-white/70">
-            <AirPlayButton className="aria-hidden:hidden group ring-sky-400 relative inline-flex h-8 w-8 md:h-10 md:w-10 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-indigo-400">
-              <Airplay className="w-5 h-5" />
-            </AirPlayButton>
-            <GoogleCastButton className="aria-hidden:hidden group ring-sky-400 relative inline-flex h-8 w-8 md:h-10 md:w-10 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-indigo-400">
-              <Cast className="w-5 h-5" />
-            </GoogleCastButton>
-            <CaptionButton className="aria-hidden:hidden group ring-sky-400 relative inline-flex h-8 w-8 md:h-10 md:w-10 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-indigo-400">
-              <CaptionsOff className="w-5 h-5 md:w-6 md:h-6 hidden group-data-active:block" />
-              <CaptionsIcon className="w-5 h-5 md:w-6 md:h-6 group-data-active:hidden" />
-            </CaptionButton>
-            <FullscreenButton className="aria-hidden:hidden group ring-sky-400 relative inline-flex h-8 w-8 md:h-10 md:w-10 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-indigo-400">
-              <Maximize className="w-4 h-4 md:w-5 md:h-5 group-data-active:hidden" />
-              <Minimize className="w-4 h-4 md:w-5 md:h-5 hidden group-data-active:block" />
-            </FullscreenButton>
+        <div className="flex items-center gap-1 md:gap-3 text-white/80">
+          {/* Picture-in-Picture Button */}
+          <PIPButton
+            className="aria-hidden:hidden group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+            aria-label="Picture in Picture"
+            title="Picture in Picture"
+          >
+            <PictureInPicture className="w-4 h-4 md:w-4.5 md:h-4.5" />
+          </PIPButton>
 
-            {!useMediaState("fullscreen") && (
-              <button
-                onClick={toggleChat}
-                className="group ring-sky-400 relative inline-flex h-8 w-8 md:h-10 md:w-10 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-indigo-400 p-1"
-                aria-label="Toggle Chat"
-              >
-                {isChatOpen ? (
-                  <MessageSquare className="w-4 h-4 md:w-5 md:h-5" />
-                ) : (
-                  <MessageSquareOff className="w-4 h-4 md:w-5 md:h-5" />
-                )}
-              </button>
-            )}
+          {/* Airplay Button */}
+          <AirPlayButton
+            className="aria-hidden:hidden group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+            title="AirPlay"
+          >
+            <Airplay className="w-4 h-4 md:w-4.5 md:h-4.5" />
+          </AirPlayButton>
 
-            <Menu.Root>
-              <Menu.Button
-                className="group ring-sky-400 relative inline-flex h-8 w-8 md:h-10 md:w-10 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-indigo-400 p-1"
-                aria-label="Settings"
-              >
-                <Settings className="h-4 md:h-5 md:w-5 transform transition-transform duration-200 ease-out group-data-open:rotate-90" />
-              </Menu.Button>
-              <Menu.Items
-                className="animate-out fade-out slide-out-to-bottom-2 data-open:animate-in data-open:fade-in data-open:slide-in-from-bottom-4 flex h-(--menu-height) max-h-100 min-w-65 flex-col overflow-y-auto overscroll-y-contain rounded-md border border-white/10 bg-black/95 p-2.5 font-sans text-[15px] font-medium outline-none backdrop-blur-sm transition-[height] duration-300 will-change-[height] data-resizing:overflow-hidden"
-                placement="top"
-                offset={0}
-              >
-                <div className="flex flex-col gap-1">
-                  <div className="px-2.5 pb-2 text-xs font-bold uppercase tracking-widest text-white/40">
-                    Settings
-                  </div>
+          {/* Google Cast Button */}
+          <GoogleCastButton
+            className="aria-hidden:hidden group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+            title="Cast"
+          >
+            <Cast className="w-4 h-4 md:w-4.5 md:h-4.5" />
+          </GoogleCastButton>
 
-                  {/* Quality Submenu */}
-                  <QualitySubmenu />
+          {/* Captions Button */}
+          <CaptionButton
+            className="aria-hidden:hidden group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+            title="Captions"
+          >
+            <CaptionsOff className="w-4 h-4 md:w-5 md:h-5 hidden group-data-active:block" />
+            <CaptionsIcon className="w-4 h-4 md:w-5 md:h-5 group-data-active:hidden" />
+          </CaptionButton>
 
-                  {/* Speed Submenu */}
-                  <SpeedSubmenu />
+          {/* Fullscreen Button */}
+          <FullscreenButton
+            className="aria-hidden:hidden group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+            title="Fullscreen"
+          >
+            <Maximize className="w-4 h-4 md:w-4.5 md:h-4.5 group-data-active:hidden" />
+            <Minimize className="w-4 h-4 md:w-4.5 md:h-4.5 hidden group-data-active:block" />
+          </FullscreenButton>
 
-                  {/* Captions Submenu */}
-                  <CaptionsSubmenu />
+          {/* Chat Toggle Button (when not fullscreen) */}
+          {!useMediaState("fullscreen") && (
+            <button
+              onClick={toggleChat}
+              className="group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+              aria-label="Toggle Chat"
+              title={isChatOpen ? "Close Chat" : "Open Chat"}
+            >
+              {isChatOpen ? (
+                <MessageSquare className="w-4 h-4 md:w-4.5 md:h-4.5" />
+              ) : (
+                <MessageSquareOff className="w-4 h-4 md:w-4.5 md:h-4.5" />
+              )}
+            </button>
+          )}
+
+          {/* Settings Menu (Speed, Quality, Captions) */}
+          <Menu.Root>
+            <Menu.Button
+              className="group ring-sky-400 relative inline-flex h-8 w-8 md:h-9 md:w-9 cursor-pointer items-center justify-center rounded-md outline-none ring-inset hover:bg-white/20 data-focus:ring-4 data-active:text-primary transition-colors"
+              aria-label="Settings"
+              title="Settings (Speed & Quality)"
+            >
+              <Settings className="h-4 w-4 md:h-4.5 md:w-4.5 transform transition-transform duration-200 ease-out group-data-open:rotate-90" />
+            </Menu.Button>
+            <Menu.Items
+              className="animate-out fade-out slide-out-to-bottom-2 data-open:animate-in data-open:fade-in data-open:slide-in-from-bottom-4 flex h-(--menu-height) max-h-100 min-w-65 flex-col overflow-y-auto overscroll-y-contain rounded-md border border-white/10 bg-black/95 p-2.5 font-sans text-[15px] font-medium outline-none backdrop-blur-sm transition-[height] duration-300 will-change-[height] data-resizing:overflow-hidden shadow-2xl"
+              placement="top"
+              offset={0}
+            >
+              <div className="flex flex-col gap-1">
+                <div className="px-2.5 pb-2 text-xs font-bold uppercase tracking-widest text-white/40">
+                  Settings
                 </div>
-              </Menu.Items>
-            </Menu.Root>
-          </div>
+
+                {/* Speed Submenu */}
+                <SpeedSubmenu />
+
+                {/* Quality Submenu */}
+                <QualitySubmenu />
+
+                {/* Captions Submenu */}
+                <CaptionsSubmenu />
+              </div>
+            </Menu.Items>
+          </Menu.Root>
         </div>
       </div>
     </Controls.Root>
@@ -310,41 +438,20 @@ function SubmenuButton({
   );
 }
 
-const DEFAULT_FALLBACK_VIDEOS = [
-  {
-    id: "demo-blacktree-1",
-    title: "BlackTree TV - Saturday Movies: The Player (1992)",
-    provider: "Cloudflare",
-    videoUrl: "https://customer-nlwo0ik8gfher2ji.cloudflarestream.com/d99e2141121daef03fc2d67de62d50f6/watch",
-    size: 7200,
-  },
-  {
-    id: "demo-blacktree-2",
-    title: "BlackTree TV - Alex Haley's Queen (1993)",
-    provider: "Cloudflare",
-    videoUrl: "https://customer-nlwo0ik8gfher2ji.cloudflarestream.com/911e61694b9f91db87777a3c26d67f61/watch",
-    size: 16171,
-  },
-  {
-    id: "demo-hls-stream",
-    title: "BlackTree Stream Live Broadcast Demo",
-    provider: "HLS",
-    videoUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    size: 600,
-  },
-];
-
 const getStreamUrl = (video: any) => {
   if (!video) return "";
   const provider = (video.provider || video.platform || "")?.toLowerCase();
   const url = video.videoUrl || "";
 
-  if (provider === "youtube") {
-    // If the videoUrl is just the 11-character video ID, use 'youtube/VIDEO_ID' for Vidstack
-    if (url.length === 11 && !url.includes("/")) {
-      return `youtube/${url}`;
+  if (provider === "youtube" || url.includes("youtube.com") || url.includes("youtu.be")) {
+    let videoId = url;
+    if (url.includes("/")) {
+      const regExp =
+        /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      videoId = match && match[2] && match[2].length === 11 ? match[2] : url;
     }
-    return url;
+    return `youtube/${videoId}`;
   }
 
   if (provider === "cloudflare" || url.includes("cloudflarestream.com")) {
@@ -362,7 +469,7 @@ const getPosterUrl = (video: any) => {
   const provider = (video.provider || video.platform || "")?.toLowerCase();
   const url = video.videoUrl || "";
 
-  if (provider === "youtube") {
+  if (provider === "youtube" || url.includes("youtube.com") || url.includes("youtu.be")) {
     let videoId = url;
     if (url.includes("/")) {
       const regExp =
@@ -370,7 +477,6 @@ const getPosterUrl = (video: any) => {
       const match = url.match(regExp);
       videoId = match && match[2] && match[2].length === 11 ? match[2] : url;
     }
-    // hqdefault.jpg is guaranteed to exist for all YouTube videos, preventing 404 logs
     return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
   }
 
@@ -412,7 +518,6 @@ const VidPlayer = () => {
     if (instance) {
       unsubscribeRef.current = instance.subscribe(
         ({ volume: newVolume, muted: newMuted }) => {
-          // Ignore state updates from the player during source transitions to prevent overwriting stored preference
           if (!initialSeekDone.current) return;
 
           const store = usePlayerStore.getState();
@@ -427,67 +532,19 @@ const VidPlayer = () => {
     }
   };
 
-  // Fetch videos from the API
-  const { data, isLoading } = useQuery({
-    queryKey: ["videos"],
-    queryFn: async () => {
-      const res = await fetch("/api/video?limit=100");
-      if (!res.ok) throw new Error("Failed to fetch videos");
-      return res.json();
-    },
-    staleTime: 1000 * 60 * 5, 
-    refetchOnWindowFocus: false, 
-  });
+  // Directly use frontend Marvel video list (100% standalone frontend)
+  const videos = FRONTEND_VIDEOS;
+  const isLoading = false;
 
-  const videos = (data?.data && data.data.length > 0) ? data.data : DEFAULT_FALLBACK_VIDEOS;
-
-  useEffect(() => {
-    if (data?.serverTime) {
-      clockOffsetRef.current = data.serverTime - Date.now();
-    }
-  }, [data]);
-
-  // Update active video in store based on synchronized epoch time when videos load
+  // Set default active video on initial load if none active
   useEffect(() => {
     if (videos.length > 0 && !activeVideo) {
-      const totalDuration = videos.reduce(
-        (acc: number, v: any) => acc + (v.size || 0),
-        0,
-      );
-      if (totalDuration > 0) {
-        const syncNow = Math.floor(
-          (Date.now() + clockOffsetRef.current) / 1000,
-        );
-        const cycleOffset = syncNow % totalDuration;
-
-        let accumulatedTime = 0;
-        let expectedVideo = videos[0];
-
-        for (const video of videos) {
-          const duration = video.size || 0;
-          if (
-            cycleOffset >= accumulatedTime &&
-            cycleOffset < accumulatedTime + duration
-          ) {
-            expectedVideo = video;
-            break;
-          }
-          accumulatedTime += duration;
-        }
-
-        setActiveVideo(expectedVideo);
-        // Silently sync the URL as well
-        const newUrl = `${window.location.pathname}?v=${expectedVideo.id}`;
-        window.history.replaceState(
-          { ...window.history.state, as: newUrl, url: newUrl },
-          "",
-          newUrl,
-        );
-      } else {
-        setActiveVideo(videos[0]);
-      }
+      const selected = videoId
+        ? videos.find((v) => v.id === videoId) || videos[0]
+        : videos[0];
+      setActiveVideo(selected);
     }
-  }, [videos, activeVideo, setActiveVideo]);
+  }, [videos, activeVideo, setActiveVideo, videoId]);
 
   // Reset initial seek state and clear existing text tracks when activeVideo changes
   useEffect(() => {
@@ -501,96 +558,20 @@ const VidPlayer = () => {
     }
   }, [activeVideo?.id]);
 
-  const syncPlayback = () => {
-    if (!playerInstanceRef.current || videos.length === 0) return;
-
-    const totalDuration = videos.reduce(
-      (acc: number, v: any) => acc + (v.size || 0),
-      0,
-    );
-    if (totalDuration === 0) return;
-
-    const syncNow = Math.floor((Date.now() + clockOffsetRef.current) / 1000);
-    const cycleOffset = syncNow % totalDuration;
-
-    let accumulatedTime = 0;
-    let expectedVideo = videos[0];
-    let expectedSeekOffset = 0;
-
-    for (const video of videos) {
-      const duration = video.size || 0;
-      if (
-        cycleOffset >= accumulatedTime &&
-        cycleOffset < accumulatedTime + duration
-      ) {
-        expectedVideo = video;
-        expectedSeekOffset = cycleOffset - accumulatedTime;
-        break;
-      }
-      accumulatedTime += duration;
-    }
-
-    // 1. If expected video is different from the current active video, transition to it
-    if (activeVideo && expectedVideo.id !== activeVideo.id) {
-      console.log(
-        "Sync: Switching video to stay in sync with broadcast:",
-        expectedVideo.title,
-      );
-      setActiveVideo(expectedVideo);
-      // Update address bar silently
-      const newUrl = `${window.location.pathname}?v=${expectedVideo.id}`;
-      window.history.replaceState(
-        { ...window.history.state, as: newUrl, url: newUrl },
-        "",
-        newUrl,
-      );
-      initialSeekDone.current = false; // Trigger seek when new video becomes ready
-      return;
-    }
-
-    // Only perform drift checking/seeking if initial sync seek has completed
-    if (!initialSeekDone.current) return;
-
-    // 2. If it's the correct video, check if playback position is in sync (within 3 seconds threshold)
-    const currentPlayerTime = playerInstanceRef.current.currentTime;
-    const timeDifference = Math.abs(currentPlayerTime - expectedSeekOffset);
-
-    if (timeDifference > 3) {
-      console.log(
-        `Sync: Player is out of sync by ${timeDifference.toFixed(1)}s. Seeking to ${expectedSeekOffset.toFixed(1)}s.`,
-      );
-      playerInstanceRef.current.currentTime = expectedSeekOffset;
-    }
-  };
-
-  // Run periodic self-healing sync check
-  useEffect(() => {
-    if (videos.length === 0 || !activeVideo) return;
-
-    // Run initial sync check immediately
-    syncPlayback();
-
-    const interval = setInterval(() => {
-      syncPlayback();
-    }, 10000); // Check sync every 10 seconds
-
-    return () => clearInterval(interval);
-  }, [videos, activeVideo]);
-
-  // Handle video ending to play the next one (continuous stream)
+  // Handle video ending to play the next one (continuous playlist loop)
   const handleEnded = () => {
     if (videos.length > 0 && activeVideo) {
       const currentIndex = videos.findIndex(
         (v: any) => v.id === activeVideo.id,
       );
-      const nextIndex = (currentIndex + 1) % videos.length; // Loop back to the first video
+      const nextIndex = (currentIndex + 1) % videos.length; // Advance to next video (or loop back to first)
       const nextVideo = videos[nextIndex];
 
       if (nextVideo) {
-        // 1. Instantly update Zustand store to change the player source and meta in-place (no remount/reload)
+        // Instantly update Zustand store to change the player source to next video
         setActiveVideo(nextVideo);
 
-        // 2. Silently update the address bar URL without triggering Next.js router re-rendering
+        // Silently update address bar URL
         const newUrl = `${window.location.pathname}?v=${nextVideo.id}`;
         window.history.replaceState(
           { ...window.history.state, as: newUrl, url: newUrl },
@@ -601,53 +582,53 @@ const VidPlayer = () => {
     }
   };
 
-  // Perform synchronized seek as soon as the media can play
+  // Perform setup as soon as the media is ready
   const handleCanPlay = () => {
-    if (
-      !initialSeekDone.current &&
-      playerInstanceRef.current &&
-      videos.length > 0
-    ) {
-      // Restore muted and volume states from the store to prevent default/autoplay resets
+    if (playerInstanceRef.current) {
       const store = usePlayerStore.getState();
       playerInstanceRef.current.muted = store.isMuted;
       playerInstanceRef.current.volume = store.volume;
+      playerInstanceRef.current.play().catch(() => {});
+    }
+  };
 
-      const totalDuration = videos.reduce(
-        (acc: number, v: any) => acc + (v.size || 0),
-        0,
+  // Advance to next video
+  const handleNext = () => {
+    if (videos.length > 0 && activeVideo) {
+      const currentIndex = videos.findIndex(
+        (v: any) => v.id === activeVideo.id,
       );
-      if (totalDuration > 0) {
-        const syncNow = Math.floor(
-          (Date.now() + clockOffsetRef.current) / 1000,
+      const nextIndex = (currentIndex + 1) % videos.length;
+      const nextVideo = videos[nextIndex];
+      if (nextVideo) {
+        setActiveVideo(nextVideo);
+        const newUrl = `${window.location.pathname}?v=${nextVideo.id}`;
+        window.history.replaceState(
+          { ...window.history.state, as: newUrl, url: newUrl },
+          "",
+          newUrl,
         );
-        const cycleOffset = syncNow % totalDuration;
-
-        let accumulatedTime = 0;
-        let expectedSeekOffset = 0;
-
-        for (const video of videos) {
-          const duration = video.size || 0;
-          if (
-            cycleOffset >= accumulatedTime &&
-            cycleOffset < accumulatedTime + duration
-          ) {
-            expectedSeekOffset = cycleOffset - accumulatedTime;
-            break;
-          }
-          accumulatedTime += duration;
-        }
-
-        // Only seek if the expected seek offset is valid and within the video duration
-        if (
-          expectedSeekOffset > 0 &&
-          expectedSeekOffset < (activeVideo?.size || Infinity)
-        ) {
-          console.log("CanPlay Sync: Initial seek to:", expectedSeekOffset);
-          playerInstanceRef.current.currentTime = expectedSeekOffset;
-        }
       }
-      initialSeekDone.current = true;
+    }
+  };
+
+  // Back to previous video
+  const handlePrev = () => {
+    if (videos.length > 0 && activeVideo) {
+      const currentIndex = videos.findIndex(
+        (v: any) => v.id === activeVideo.id,
+      );
+      const prevIndex = (currentIndex - 1 + videos.length) % videos.length;
+      const prevVideo = videos[prevIndex];
+      if (prevVideo) {
+        setActiveVideo(prevVideo);
+        const newUrl = `${window.location.pathname}?v=${prevVideo.id}`;
+        window.history.replaceState(
+          { ...window.history.state, as: newUrl, url: newUrl },
+          "",
+          newUrl,
+        );
+      }
     }
   };
 
@@ -681,7 +662,7 @@ const VidPlayer = () => {
       playsInline
       logLevel="silent"
       viewType="video"
-      streamType="live"
+      streamType="on-demand"
       autoPlay
       muted={isMuted}
       volume={volume}
@@ -737,7 +718,11 @@ const VidPlayer = () => {
         </div>
       </div>
 
-      <CinematicControls title={activeVideo.title} />
+      <CinematicControls
+        title={activeVideo.title}
+        onNext={handleNext}
+        onPrev={handlePrev}
+      />
 
       <BufferingIndicator />
     </MediaPlayer>
