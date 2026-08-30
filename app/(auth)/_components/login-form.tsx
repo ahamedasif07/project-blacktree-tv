@@ -39,7 +39,7 @@ export const LoginForm = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const router = useRouter();
   
-  const { signInInitiate, isSigningInInitiate } = useAuth();
+  const { signIn, isSigningIn } = useAuth();
 
   const form = useForm<ZTAuthLogin>({
     resolver: zodResolver(ZCAuthLogin),
@@ -52,16 +52,8 @@ export const LoginForm = () => {
 
   const onSubmit = async (data: ZTAuthLogin) => {
     try {
-      const { email, password, rememberMe } = data;
-      const res = await signInInitiate({ email, password });
-      if (res?.success && res?.data?.requireOTP) {
-        sessionStorage.setItem(
-          "temp_login_credentials",
-          JSON.stringify({ email, password, rememberMe })
-        );
-        toast.success("OTP code sent to your email!");
-        router.push(`/verify-otp?email=${encodeURIComponent(email)}&flow=login`);
-      }
+      const { email, password } = data;
+      await signIn({ email, password });
     } catch (error) {
       console.error(error);
     }
@@ -216,13 +208,13 @@ export const LoginForm = () => {
 
               <Button
                 type="submit"
-                disabled={isSigningInInitiate}
+                disabled={isSigningIn}
                 className="mt-2 h-12 w-full cursor-pointer rounded-lg bg-[#E50914] text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-101 hover:bg-[#c40812] flex items-center justify-center gap-2"
               >
-                {isSigningInInitiate ? (
+                {isSigningIn ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Sending OTP...
+                    Signing In...
                   </>
                 ) : (
                   "Sign In"
