@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/hooks/useAuth";
+import useAuthStore from "@/store/auth/use-auth-store";
 import api from "@/lib/axios";
 import { useUserProfileStore } from "@/store/public/use-user-profile-store";
 import {
@@ -24,7 +24,7 @@ import { getErrorMessage } from "@/lib/utils";
 
 const ProfileOverview = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthStore();
 
   // Zustand Store bindings
   const {

@@ -28,16 +28,21 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { NAVIGATION_ITEMS } from "@/constants";
-import { useAuth } from "@/hooks/useAuth";
+import useAuthStore from "@/store/auth/use-auth-store";
 import { useNavbar } from "@/store/public/use-navbar-store";
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading, logout, checkAuth } = useAuthStore();
   const { isSearchOpen, setSearch, isMobileMenuOpen, setMobileMenu } =
     useNavbar();
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Check auth session on load
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   // State to track scroll position
   const [isScrolled, setIsScrolled] = useState(false);

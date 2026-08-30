@@ -5,16 +5,18 @@ import Link from "next/link";
 import { Eye, EyeOff, Loader2, Lock, Mail, ShieldCheck, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/hooks/useAuth";
+import useAuthStore from "@/store/auth/use-auth-store";
 
 export const LoginForm = () => {
+  const router = useRouter();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
-  const { signIn, isSigningIn } = useAuth();
+  const { signIn, isSigningIn } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,9 +26,12 @@ export const LoginForm = () => {
     }
 
     try {
-      await signIn({ email, password });
+      const success = await signIn({ email, password });
+      if (success) {
+        router.push("/");
+      }
     } catch {
-      // Error handled in hook toast
+      // Error handled in store toast
     }
   };
 

@@ -1,5 +1,6 @@
 "use client";
-import { useAuth } from "@/hooks/useAuth";
+
+import useAuthStore from "@/store/auth/use-auth-store";
 import { useUserProfileStore } from "@/store/public/use-user-profile-store";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
@@ -25,8 +26,12 @@ import Link from "next/link";
 
 export function ProfileLayout({ children }: { children: React.ReactNode }) {
   const { profile } = useUserProfileStore();
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading, logout, checkAuth } = useAuthStore();
   const router = useRouter();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   useEffect(() => {
     if (!isLoading && !user) {
