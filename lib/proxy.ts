@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function proxyMiddleware(request: NextRequest) {
+  const backendHost = process.env.BACKEND_URL;
+  if (!backendHost) {
+    return NextResponse.next();
+  }
+
   const { pathname, search } = request.nextUrl;
-  const backendHost = process.env.BACKEND_URL || "http://localhost:5000";
   const targetUrl = new URL(pathname + search, backendHost);
   
   // Set headers to forward details
