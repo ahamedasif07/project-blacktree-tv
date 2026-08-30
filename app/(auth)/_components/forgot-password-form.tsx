@@ -1,29 +1,17 @@
 "use client";
 
+import * as React from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { Controller, useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
+import { ArrowLeft, KeyRound, Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/useAuth";
 import { ZCAuthForgotPassword, ZTAuthForgotPassword } from "@/types/zod/auth";
 
 export const ForgotPasswordForm = () => {
@@ -40,7 +28,7 @@ export const ForgotPasswordForm = () => {
   const onSubmit = async (data: ZTAuthForgotPassword) => {
     try {
       await forgotPassword(data);
-      toast.success("Verification OTP sent to your email!");
+      toast.success("Verification code sent to your email!");
       router.push(`/verify-otp?email=${encodeURIComponent(data.email)}&flow=reset-password`);
     } catch (err) {
       console.error(err);
@@ -49,75 +37,70 @@ export const ForgotPasswordForm = () => {
 
   return (
     <div className="w-full flex items-center justify-center px-4">
-      <Card className="w-full md:max-w-[440px] lg:max-w-[500px] xl:max-w-[586px] border border-[#FFFFFF0D] bg-[#141414] text-white shadow-2xl rounded-2xl px-2 md:px-4">
-        <CardHeader className="space-y-4 pb-6 pt-10">
-          <CardTitle className="text-center text-3xl md:text-4xl font-bold tracking-tight">
-            Forgot Password?
-          </CardTitle>
-          <CardDescription className="text-center text-sm md:text-base text-zinc-400 max-w-[280px] md:max-w-[340px] mx-auto leading-relaxed">
-            Enter your email address and we&apos;ll send you a link to reset
-            your password.
-          </CardDescription>
+      <Card className="w-full max-w-[440px] lg:max-w-[480px] border border-white/10 bg-zinc-950/80 backdrop-blur-2xl text-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] rounded-3xl p-2 sm:p-4 transition-all duration-300">
+        <CardHeader className="space-y-3 pb-6 pt-6 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-red-600/20 to-red-500/10 border border-red-500/30 shadow-[0_0_20px_rgba(229,9,20,0.2)]">
+            <KeyRound className="h-7 w-7 text-red-500" />
+          </div>
+
+          <div>
+            <CardTitle className="text-3xl font-bold tracking-tight text-white">
+              Forgot Password
+            </CardTitle>
+            <CardDescription className="text-sm text-zinc-400 mt-1 max-w-[320px] mx-auto leading-relaxed">
+              Enter your registered email address and we&apos;ll send you a recovery code.
+            </CardDescription>
+          </div>
         </CardHeader>
 
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FieldGroup>
-              <Controller
-                name="email"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field
-                    data-invalid={fieldState.invalid}
-                    className="space-y-3"
-                  >
-                    <FieldLabel
-                      htmlFor="forgot-email"
-                      className="text-[10px] md:text-xs font-bold text-zinc-500 uppercase tracking-widest"
-                    >
-                      Email Address
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id="forgot-email"
-                      type="email"
-                      placeholder="name@example.com"
-                      autoComplete="email"
-                      aria-invalid={fieldState.invalid}
-                      className="h-12 md:h-14 rounded-lg border bg-transparent! border-[#FFFFFF1A] px-4 text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#FFFFFF1A] text-sm md:text-base"
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
+        <CardContent className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <Input
+                  {...form.register("email")}
+                  type="email"
+                  placeholder="name@example.com"
+                  className="h-12 pl-10 pr-4 rounded-xl border-white/10 bg-zinc-900/60 text-sm text-white placeholder:text-zinc-600 focus-visible:border-red-500 focus-visible:ring-2 focus-visible:ring-red-500/20 transition-all"
+                />
+              </div>
+              {form.formState.errors.email && (
+                <p className="text-xs text-red-400 mt-1 font-medium">
+                  {form.formState.errors.email.message}
+                </p>
+              )}
+            </div>
 
+            {/* Submit Button */}
             <Button
               type="submit"
               disabled={isForgotPasswordPending}
-              className="h-12 md:h-14 w-full rounded-lg bg-primary text-sm md:text-base font-bold text-white cursor-pointer transition-all duration-300 ease-in-out hover:scale-101 hover:bg-primary/90 shadow-lg flex items-center justify-center gap-2"
+              className="h-12 w-full mt-2 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold shadow-[0_0_25px_rgba(229,9,20,0.3)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
             >
               {isForgotPasswordPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Sending...
+                  <span>Sending Recovery Code...</span>
                 </>
               ) : (
-                "Send"
+                "Send Recovery Code"
               )}
             </Button>
           </form>
         </CardContent>
 
-        <CardFooter className="flex justify-center pb-10 pt-4">
+        <CardFooter className="flex justify-center pb-4 pt-2">
           <Link
             href="/login"
-            className="flex items-center gap-2 text-[10px] md:text-xs font-bold text-zinc-500 uppercase tracking-widest cursor-pointer transition-colors hover:text-white group"
+            className="flex items-center gap-2 text-xs font-semibold text-zinc-400 hover:text-white transition-colors group cursor-pointer"
           >
-            <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" />
-            Back to Login
+            <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" />
+            Back to Sign In
           </Link>
         </CardFooter>
       </Card>
