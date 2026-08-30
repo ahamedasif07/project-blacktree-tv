@@ -31,8 +31,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
-import { authClient } from "@/lib/auth/auth-client";
-
 import { ZCAuthLogin, ZTAuthLogin } from "@/types/zod/auth";
 
 export const LoginForm = () => {
@@ -59,16 +57,8 @@ export const LoginForm = () => {
     }
   };
 
-  const handleSocialLogin = async (provider: "google" | "facebook") => {
-    try {
-      await authClient.signIn.social({
-        provider,
-        callbackURL: window.location.origin,
-      });
-    } catch (error) {
-      toast.error("Social login failed");
-      console.error(error);
-    }
+  const handleSocialLogin = (provider: "google" | "facebook") => {
+    toast.info(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login will be available soon`);
   };
 
   return (
