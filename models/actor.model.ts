@@ -70,5 +70,4 @@ const ActorSchema = new Schema<IActor>(
 const Actor: Model<IActor> =
   mongoose.models.Actor || mongoose.model<IActor>("Actor", ActorSchema);
 
-export { Actor };
 export default Actor;

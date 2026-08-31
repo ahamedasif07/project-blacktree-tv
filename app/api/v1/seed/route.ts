@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { runDatabaseSeed } from "@/lib/seed/seed";
+import { runDatabaseSeed } from "@/scripts/seed";
 
 export async function GET() {
   try {

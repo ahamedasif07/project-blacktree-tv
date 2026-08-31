@@ -121,5 +121,4 @@ const MovieSchema = new Schema<IMovie>(
 const Movie: Model<IMovie> =
   mongoose.models.Movie || mongoose.model<IMovie>("Movie", MovieSchema);
 
-export { Movie };
 export default Movie;

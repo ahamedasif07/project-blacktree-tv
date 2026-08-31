@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/db";
-import { User, IUser, UserRole } from "@/models/user.model";
+import User, { IUser, UserRole } from "@/models/user.model";
 import { signToken, TokenPayload } from "@/lib/jwt";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
