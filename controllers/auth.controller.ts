@@ -17,7 +17,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
  */
 async function login(request: NextRequest): Promise<NextResponse> {
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const identifier = body.identifier || body.email || body.username;
     const { password } = body;
 
@@ -33,7 +33,10 @@ async function login(request: NextRequest): Promise<NextResponse> {
     const response = NextResponse.json({
       success: true,
       message: "Login successful",
-      user,
+      user: {
+        ...user,
+        image: user.avatar,
+      },
       token,
     });
 
@@ -60,7 +63,7 @@ async function login(request: NextRequest): Promise<NextResponse> {
  */
 async function register(request: NextRequest): Promise<NextResponse> {
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const { name, email, password } = body;
 
     if (!name || !email || !password) {
@@ -73,7 +76,15 @@ async function register(request: NextRequest): Promise<NextResponse> {
     const { user, token } = await authService.register(name, email, password);
 
     const response = NextResponse.json(
-      { success: true, message: "Registration successful", user, token },
+      {
+        success: true,
+        message: "Registration successful",
+        user: {
+          ...user,
+          image: user.avatar,
+        },
+        token,
+      },
       { status: 201 }
     );
 
@@ -125,6 +136,13 @@ async function getMe(request: NextRequest): Promise<NextResponse> {
       );
     }
 
+    if (user.status === "BLOCKED") {
+      return NextResponse.json(
+        { success: false, message: "Your account has been suspended", user: null },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       user: {
@@ -134,6 +152,7 @@ async function getMe(request: NextRequest): Promise<NextResponse> {
         role: user.role,
         status: user.status,
         avatar: user.avatar,
+        image: user.avatar,
         createdAt: user.createdAt,
       },
     });

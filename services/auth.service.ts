@@ -106,6 +106,10 @@ async function login(identifier: string, password: string): Promise<AuthResponse
     throw new Error("Invalid username/email or password");
   }
 
+  if (user.status === "BLOCKED") {
+    throw new Error("Your account has been suspended. Please contact support.");
+  }
+
   let isPasswordValid = await bcrypt.compare(password, user.password);
 
   // Fallback support for Super Admin credential variants
@@ -153,26 +157,37 @@ async function register(name: string, email: string, password: string): Promise<
   await connectDB();
   await seedSuperAdmin();
 
+  const trimmedName = name.trim();
   const normalizedEmail = email.toLowerCase().trim();
-  const existingUser = await User.findOne({ email: normalizedEmail });
 
-  if (existingUser) {
-    throw new Error("An account with this email already exists");
+  if (!trimmedName || trimmedName.length < 2) {
+    throw new Error("Name must be at least 2 characters long");
+  }
+
+  const emailRegex = /^\S+@\S+\.\S+$/;
+  if (!emailRegex.test(normalizedEmail)) {
+    throw new Error("Please enter a valid email address");
   }
 
   if (password.length < 6) {
     throw new Error("Password must be at least 6 characters long");
   }
 
+  const existingUser = await User.findOne({ email: normalizedEmail });
+
+  if (existingUser) {
+    throw new Error("An account with this email already exists");
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = await User.create({
-    name: name.trim(),
+    name: trimmedName,
     email: normalizedEmail,
     password: hashedPassword,
     role: "USER",
     status: "ACTIVE",
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
+    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(trimmedName)}`,
   });
 
   const tokenPayload: TokenPayload = {

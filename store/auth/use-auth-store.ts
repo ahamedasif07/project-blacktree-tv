@@ -70,6 +70,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const response = await api.post("/auth/login", credentials);
       if (response.data?.success && response.data?.user) {
         const user = response.data.user;
+        const token = response.data.token;
+        if (typeof window !== "undefined" && token) {
+          localStorage.setItem("auth-token", token);
+        }
         set({
           user,
           isAuthenticated: true,
@@ -99,6 +103,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const response = await api.post("/auth/register", credentials);
       if (response.data?.success && response.data?.user) {
         const user = response.data.user;
+        const token = response.data.token;
+        if (typeof window !== "undefined" && token) {
+          localStorage.setItem("auth-token", token);
+        }
         set({
           user,
           isAuthenticated: true,
@@ -128,6 +136,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error("Logout API error:", error);
     } finally {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("auth-token");
+      }
       set({
         user: null,
         isAuthenticated: false,
@@ -150,6 +161,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           isLoading: false,
         });
       } else {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("auth-token");
+        }
         set({
           user: null,
           isAuthenticated: false,
@@ -157,6 +171,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
       }
     } catch {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("auth-token");
+      }
       set({
         user: null,
         isAuthenticated: false,

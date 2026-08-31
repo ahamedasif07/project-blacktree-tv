@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL || "mongodb://localhost:27017/blacktree_tv";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://blacktreeTV:X4OykIPgLvtz1BJV@cluster0.tzvnomp.mongodb.net/?appName=Cluster0";
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
