@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IMovie extends Document {
-  id: number;
   title: string;
   slug: string;
   description: string;
@@ -28,11 +27,6 @@ export interface IMovie extends Document {
 
 const MovieSchema = new Schema<IMovie>(
   {
-    id: {
-      type: Number,
-      required: true,
-      unique: true,
-    },
     title: {
       type: String,
       required: [true, "Title is required"],
@@ -124,5 +118,8 @@ const MovieSchema = new Schema<IMovie>(
   }
 );
 
-export const Movie: Model<IMovie> =
+const Movie: Model<IMovie> =
   mongoose.models.Movie || mongoose.model<IMovie>("Movie", MovieSchema);
+
+export { Movie };
+export default Movie;

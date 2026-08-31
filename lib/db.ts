@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://blacktreeTV:X4OykIPgLvtz1BJV@cluster0.tzvnomp.mongodb.net/?appName=Cluster0";
+const MONGODB_URI = (process.env.MONGODB_URI || "mongodb+srv://blacktreeTV:X4OykIPgLvtz1BJV@cluster0.tzvnomp.mongodb.net/blacktree_tv?retryWrites=true&w=majority&appName=Cluster0").trim().replace(/;$/, "");
 
 /**
  * Global is used here to maintain a cached connection across hot reloads

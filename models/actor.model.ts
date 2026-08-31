@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IActor extends Document {
-  id: number;
   slug: string;
   name: string;
   role: string;
@@ -21,11 +20,6 @@ export interface IActor extends Document {
 
 const ActorSchema = new Schema<IActor>(
   {
-    id: {
-      type: Number,
-      required: true,
-      unique: true,
-    },
     slug: {
       type: String,
       required: [true, "Slug is required"],
@@ -73,5 +67,8 @@ const ActorSchema = new Schema<IActor>(
   }
 );
 
-export const Actor: Model<IActor> =
+const Actor: Model<IActor> =
   mongoose.models.Actor || mongoose.model<IActor>("Actor", ActorSchema);
+
+export { Actor };
+export default Actor;

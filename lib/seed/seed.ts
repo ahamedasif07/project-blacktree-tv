@@ -1,54 +1,37 @@
 import { connectDB } from "@/lib/db";
-import { Movie, Actor, Video, User } from "@/models";
+import Movie from "@/models/movie.model";
+import Actor from "@/models/actor.model";
+import Video from "@/models/video.model";
+import User from "@/models/user.model";
 import bcrypt from "bcryptjs";
-import moviesData from "./movies.json";
-import actorsData from "./actors.json";
-import videosData from "./videos.json";
+import { seedMovies, seedActors, seedVideos } from "./seed-data";
 
+/**
+ * Clean and simple database seeder
+ */
 export async function runDatabaseSeed() {
   console.log("🚀 Starting database seeding...");
   await connectDB();
 
   // 1. Seed Movies
-  console.log(`🎬 Seeding ${moviesData.length} movies...`);
-  let movieCount = 0;
-  for (const movie of moviesData) {
-    await Movie.findOneAndUpdate(
-      { slug: movie.slug },
-      { ...movie },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
-    movieCount++;
+  console.log(`🎬 Seeding ${seedMovies.length} movies...`);
+  for (const movie of seedMovies) {
+    await Movie.findOneAndUpdate({ slug: movie.slug }, movie, { upsert: true });
   }
-  console.log(`✅ ${movieCount} movies seeded successfully.`);
 
   // 2. Seed Actors
-  console.log(`🌟 Seeding ${actorsData.length} actors...`);
-  let actorCount = 0;
-  for (const actor of actorsData) {
-    await Actor.findOneAndUpdate(
-      { slug: actor.slug },
-      { ...actor },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
-    actorCount++;
+  console.log(`🌟 Seeding ${seedActors.length} actors...`);
+  for (const actor of seedActors) {
+    await Actor.findOneAndUpdate({ slug: actor.slug }, actor, { upsert: true });
   }
-  console.log(`✅ ${actorCount} actors seeded successfully.`);
 
   // 3. Seed Videos
-  console.log(`📹 Seeding ${videosData.length} videos...`);
-  let videoCount = 0;
-  for (const video of videosData) {
-    await Video.findOneAndUpdate(
-      { videoId: video.videoId },
-      { ...video },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
-    videoCount++;
+  console.log(`📹 Seeding ${seedVideos.length} videos...`);
+  for (const video of seedVideos) {
+    await Video.findOneAndUpdate({ videoId: video.videoId }, video, { upsert: true });
   }
-  console.log(`✅ ${videoCount} videos seeded successfully.`);
 
-  // 4. Ensure Super Admin Exists
+  // 4. Ensure Super Admin Account Exists
   const adminEmail = "admin@blacktree.tv";
   const existingAdmin = await User.findOne({ email: adminEmail });
   if (!existingAdmin) {
@@ -63,14 +46,12 @@ export async function runDatabaseSeed() {
       avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=SuperAdmin",
     });
     console.log(`👑 Super Admin created: ${adminEmail}`);
-  } else {
-    console.log(`👑 Super Admin already exists: ${adminEmail}`);
   }
 
   console.log("🎉 Database seeding completed successfully!");
   return {
-    movies: movieCount,
-    actors: actorCount,
-    videos: videoCount,
+    movies: seedMovies.length,
+    actors: seedActors.length,
+    videos: seedVideos.length,
   };
 }
